@@ -90,3 +90,66 @@
 2025-09-27 14:24:01,702 - agent.server - INFO - Response: 200 - 0.001s
 2025-09-27 14:24:01,947 - agent.server - INFO - Request: POST http://localhost:9000/pitch/status
 2025-09-27 14:24:01,947 - agent.server - INFO - Response: 200 - 0.001s
+2025-09-27 15:01:38,041 - agent.server - INFO - Request: GET http://localhost:9000/health
+2025-09-27 15:01:38,042 - agent.server - INFO - Response: 200 - 0.001s
+2025-09-27 15:04:27,117 - agent.server - INFO - Request: POST http://127.0.0.1:9000/run
+2025-09-27 15:04:27,257 - agent.server - INFO - Response: 200 - 0.140s
+2025-09-27 15:04:27,995 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-27 15:04:31,301 - agent.server - INFO - Request: POST http://localhost:9000/pitch/initialize
+2025-09-27 15:04:31,301 - agent.server - INFO - Request: POST http://localhost:9000/pitch/initialize
+2025-09-27 15:04:31,302 - agent.server - INFO - Initializing pitch for conversation: pitch-1-1759010671011
+2025-09-27 15:04:31,302 - agent.server - INFO - Pitch initialized successfully: pitch-1-1759010671011
+2025-09-27 15:04:31,302 - agent.server - INFO - Initializing pitch for conversation: pitch-1-1759010671011
+2025-09-27 15:04:31,302 - agent.server - INFO - Pitch initialized successfully: pitch-1-1759010671011
+2025-09-27 15:04:31,302 - agent.server - INFO - Response: 200 - 0.001s
+2025-09-27 15:04:31,302 - agent.server - INFO - Response: 200 - 0.001s
+2025-09-27 15:04:31,594 - agent.server - INFO - Request: POST http://localhost:9000/pitch/status
+2025-09-27 15:04:31,595 - agent.server - INFO - Response: 200 - 0.001s
+2025-09-27 15:04:31,597 - agent.server - INFO - Request: POST http://localhost:9000/pitch/status
+2025-09-27 15:04:31,597 - agent.server - INFO - Response: 200 - 0.000s
+2025-09-27 15:04:33,174 - agent.server - INFO - Request: POST http://localhost:9000/pitch/evaluate
+2025-09-27 15:04:33,175 - agent.server - INFO - Evaluating pitch message for conversation: pitch-1-1759010671011
+2025-09-27 15:04:37,427 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-27 15:04:37,432 - agent.server - INFO - Pitch evaluation completed: pitch-1-1759010671011
+2025-09-27 15:04:37,433 - agent.server - INFO - Response: 200 - 4.259s
+2025-09-27 15:04:54,652 - agent.server - INFO - Request: POST http://localhost:9000/pitch/initialize
+2025-09-27 15:04:54,652 - agent.server - INFO - Initializing pitch for conversation: pitch-2-1759010694403
+2025-09-27 15:04:54,652 - agent.server - INFO - Pitch initialized successfully: pitch-2-1759010694403
+2025-09-27 15:04:54,652 - agent.server - INFO - Request: POST http://localhost:9000/pitch/initialize
+2025-09-27 15:04:54,652 - agent.server - INFO - Response: 200 - 0.001s
+2025-09-27 15:04:54,653 - agent.server - INFO - Initializing pitch for conversation: pitch-2-1759010694403
+2025-09-27 15:04:54,653 - agent.server - INFO - Pitch initialized successfully: pitch-2-1759010694403
+2025-09-27 15:04:54,653 - agent.server - INFO - Response: 200 - 0.001s
+2025-09-27 15:04:54,890 - agent.server - INFO - Request: POST http://localhost:9000/pitch/status
+2025-09-27 15:04:54,891 - agent.server - INFO - Response: 200 - 0.001s
+2025-09-27 15:04:54,893 - agent.server - INFO - Request: POST http://localhost:9000/pitch/status
+2025-09-27 15:04:54,894 - agent.server - INFO - Response: 200 - 0.001s
+2025-09-27 15:04:56,070 - agent.server - INFO - Request: POST http://localhost:9000/pitch/evaluate
+2025-09-27 15:04:56,071 - agent.server - INFO - Evaluating pitch message for conversation: pitch-2-1759010694403
+2025-09-27 15:04:58,267 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-27 15:04:58,270 - agent.server - INFO - Pitch evaluation completed: pitch-2-1759010694403
+2025-09-27 15:04:58,270 - agent.server - INFO - Response: 200 - 2.200s
+2025-09-27 15:05:10,610 - agent.server - INFO - Request: POST http://localhost:9000/pitch/initialize
+2025-09-27 15:05:10,610 - agent.server - INFO - Request: POST http://localhost:9000/pitch/initialize
+2025-09-27 15:05:10,611 - agent.server - INFO - Initializing pitch for conversation: pitch-2-1759010710338
+2025-09-27 15:05:10,611 - agent.server - INFO - Pitch initialized successfully: pitch-2-1759010710338
+2025-09-27 15:05:10,611 - agent.server - INFO - Response: 200 - 0.001s
+2025-09-27 15:05:10,611 - agent.server - INFO - Initializing pitch for conversation: pitch-2-1759010710338
+2025-09-27 15:05:10,611 - agent.server - INFO - Pitch initialized successfully: pitch-2-1759010710338
+2025-09-27 15:05:10,611 - agent.server - INFO - Response: 200 - 0.001s
+2025-09-27 15:05:10,860 - agent.server - INFO - Request: POST http://localhost:9000/pitch/status
+2025-09-27 15:05:10,861 - agent.server - INFO - Response: 200 - 0.000s
+2025-09-27 15:05:10,863 - agent.server - INFO - Request: POST http://localhost:9000/pitch/status
+2025-09-27 15:05:10,863 - agent.server - INFO - Response: 200 - 0.000s
+2025-09-27 15:05:12,767 - agent.server - INFO - Request: POST http://localhost:9000/pitch/initialize
+2025-09-27 15:05:12,767 - agent.server - INFO - Initializing pitch for conversation: pitch-2-1759010712499
+2025-09-27 15:05:12,767 - agent.server - INFO - Pitch initialized successfully: pitch-2-1759010712499
+2025-09-27 15:05:12,767 - agent.server - INFO - Response: 200 - 0.001s
+2025-09-27 15:05:13,014 - agent.server - INFO - Request: POST http://localhost:9000/pitch/status
+2025-09-27 15:05:13,015 - agent.server - INFO - Response: 200 - 0.001s
+2025-09-27 15:05:22,785 - agent.server - INFO - Request: POST http://localhost:9000/pitch/initialize
+2025-09-27 15:05:22,786 - agent.server - INFO - Initializing pitch for conversation: pitch-2-1759010722502
+2025-09-27 15:05:22,786 - agent.server - INFO - Pitch initialized successfully: pitch-2-1759010722502
+2025-09-27 15:05:22,786 - agent.server - INFO - Response: 200 - 0.001s
+2025-09-27 15:05:23,016 - agent.server - INFO - Request: POST http://localhost:9000/pitch/status
+2025-09-27 15:05:23,017 - agent.server - INFO - Response: 200 - 0.001s

@@ -1,12 +1,12 @@
 "use client";
 
-import { use, useState, useEffect, useRef } from "react";
+import { use, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useCopilotAction } from "@copilotkit/react-core";
+import { useCoAgent, useCopilotAction, useCopilotAdditionalInstructions } from "@copilotkit/react-core";
+import { CopilotKitCSSProperties, CopilotChat } from "@copilotkit/react-ui";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import Link from "next/link";
-import { Building2, Users, Briefcase, Globe, Target, ArrowLeft, Play, Timer, CheckCircle2, Circle, Send, X } from "lucide-react";
+import { Building2, Users, Briefcase, Globe, Target, ArrowLeft, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface PageProps {
@@ -31,25 +31,6 @@ interface CompanyDetails {
     role: string;
     focus: string;
   }[];
-}
-
-interface PitchCriteria {
-  problem_solution: boolean;
-  evidence_proof: boolean;
-  differentiation: boolean;
-  target_fit: boolean;
-  implementation: boolean;
-  credibility: boolean;
-  business_case: boolean;
-  next_steps: boolean;
-}
-
-interface PitchStatus {
-  criteria_status: PitchCriteria;
-  score_percentage: number;
-  is_passing: boolean;
-  last_evaluation: string;
-  message_count: number;
 }
 
 // Mock company data - in real app, fetch from API
@@ -194,20 +175,15 @@ export default function CompanyDetailsPage({ params }: PageProps) {
   const company = getCompanyDetails(id);
   const router = useRouter();
 
-  // Pitch mode state
-  const [isPitchMode, setIsPitchMode] = useState(false);
-  const [conversationId, setConversationId] = useState("");
-  const [messages, setMessages] = useState<{ role: string; content: string }[]>([]);
-  const [inputMessage, setInputMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [pitchStatus, setPitchStatus] = useState<PitchStatus | null>(null);
-  const [timeRemaining, setTimeRemaining] = useState(120); // 2 minutes in seconds
-  const [isPitchEnded, setIsPitchEnded] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Add company context to the AI when not in pitch mode
-  // The useCopilotAdditionalInstructions is handled by the CopilotChat component below
+  // Add company context to the AI
+  useCopilotAdditionalInstructions(
+    `You are helping a seller pitch to ${company.name}, a ${company.industry} company with ${company.employees} employees. 
+    The company's main needs are: ${company.needs.join(", ")}.
+    Their current challenges include: ${company.challenges.join(", ")}.
+    Key decision makers are: ${company.decisionMakers.map(dm => `${dm.name} (${dm.role})`).join(", ")}.
+    
+    Help the seller craft effective pitches, handle objections, and close deals. Be consultative and focus on solving the company's specific problems.`
+  );
 
   // Define actions for the pitch process
   useCopilotAction({
@@ -242,197 +218,6 @@ export default function CompanyDetailsPage({ params }: PageProps) {
     },
   });
 
-  // Pitch mode effects and functions
-  // Timer effect
-  useEffect(() => {
-    if (!isPitchMode || isPitchEnded || !pitchStatus) return;
-    
-    timerRef.current = setInterval(() => {
-      setTimeRemaining(prev => {
-        if (prev <= 1) {
-          endPitch();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-      }
-    };
-  }, [isPitchMode, isPitchEnded, pitchStatus]);
-
-  // Check if criteria met
-  useEffect(() => {
-    if (pitchStatus?.is_passing && !isPitchEnded && isPitchMode) {
-      endPitch();
-    }
-  }, [pitchStatus?.is_passing, isPitchMode]);
-
-  // Scroll to bottom
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  const startPitch = () => {
-    const newConversationId = `pitch-${id}-${Date.now()}`;
-    setConversationId(newConversationId);
-    setIsPitchMode(true);
-    setMessages([]);
-    setPitchStatus(null);
-    setTimeRemaining(120);
-    setIsPitchEnded(false);
-    initializePitch(newConversationId);
-  };
-
-  const initializePitch = async (convId: string) => {
-    let retryCount = 0;
-    const maxRetries = 3;
-    
-    while (retryCount < maxRetries) {
-      try {
-        setIsLoading(true);
-        const response = await fetch("/api/pitch/initialize", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            conversation_id: convId,
-            company_info: {
-              name: company.name,
-              industry: company.industry,
-              size: company.employees,
-              pain_points: company.challenges,
-              decision_makers: company.decisionMakers.map(dm => `${dm.name} (${dm.role})`),
-              budget_range: "$100K - $500K", // Default value
-              current_solutions: company.currentSolutions,
-            },
-          }),
-        });
-
-        if (response.ok) {
-          const result = await response.json();
-          const primaryDecisionMaker = company.decisionMakers[0];
-          setMessages([
-            {
-              role: "assistant",
-              content: `Hi there! I'm ${primaryDecisionMaker.name}, ${primaryDecisionMaker.role} at ${company.name}. I have about 2 minutes for this call. What did you want to discuss with me today?`,
-            },
-          ]);
-          await updatePitchStatus(convId);
-          return;
-        } else {
-          const errorData = await response.json();
-          throw new Error(`Server error: ${errorData.error || 'Unknown error'}`);
-        }
-      } catch (error) {
-        console.error(`Pitch initialization attempt ${retryCount + 1} failed:`, error);
-        retryCount++;
-        
-        if (retryCount < maxRetries) {
-          await new Promise(resolve => setTimeout(resolve, Math.pow(2, retryCount) * 1000));
-          continue;
-        } else {
-          setMessages([
-            {
-              role: "assistant",
-              content: `❌ Failed to initialize pitch after ${maxRetries} attempts. Please refresh the page and try again. Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
-            },
-          ]);
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    }
-  };
-
-  const updatePitchStatus = async (convId: string) => {
-    try {
-      const response = await fetch("/api/pitch/status", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ conversation_id: convId }),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        setPitchStatus(result.status);
-      }
-    } catch (error) {
-      console.error("Failed to get pitch status:", error);
-    }
-  };
-
-  const sendMessage = async () => {
-    if (!inputMessage.trim() || isPitchEnded || !isPitchMode) return;
-
-    const userMessage = inputMessage.trim();
-    setInputMessage("");
-    setMessages(prev => [...prev, { role: "user", content: userMessage }]);
-    setIsLoading(true);
-
-    try {
-      const response = await fetch("/api/pitch/evaluate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          conversation_id: conversationId,
-          message: userMessage,
-        }),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        setMessages(prev => [...prev, { role: "assistant", content: result.response }]);
-        setPitchStatus(result.status);
-      }
-    } catch (error) {
-      console.error("Failed to send message:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const endPitch = () => {
-    setIsPitchEnded(true);
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-    }
-    // Navigate to results page after a short delay
-    setTimeout(() => {
-      router.push(`/pitch-results/${conversationId}?company=${id}`);
-    }, 2000);
-  };
-
-  const exitPitchMode = () => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-    }
-    setIsPitchMode(false);
-    setMessages([]);
-    setPitchStatus(null);
-    setTimeRemaining(120);
-    setIsPitchEnded(false);
-  };
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
-  };
-
-  const criteriaLabels: Record<keyof PitchCriteria, string> = {
-    problem_solution: "Problem & Solution",
-    evidence_proof: "Evidence & Proof",
-    differentiation: "Differentiation",
-    target_fit: "Target Fit",
-    implementation: "Implementation",
-    credibility: "Credibility",
-    business_case: "Business Case",
-    next_steps: "Next Steps",
-  };
-
   return (
     <div className="min-h-screen bg-background">
       <div className="border-b p-4">
@@ -443,160 +228,38 @@ export default function CompanyDetailsPage({ params }: PageProps) {
               Back to Companies
             </Button>
           </Link>
-          <div className="flex gap-2 items-center">
-            {isPitchMode ? (
-              <>
-                <div className="flex items-center gap-4 mr-4">
-                  <div className="flex items-center gap-2">
-                    <Timer className="h-4 w-4" />
-                    <span className={`font-mono font-medium ${timeRemaining < 30 ? "text-red-500" : ""}`}>
-                      {formatTime(timeRemaining)}
-                    </span>
-                  </div>
-                  <div className="text-sm font-medium">
-                    Score: <span className="text-primary">{pitchStatus?.score_percentage.toFixed(0) || 0}%</span>
-                  </div>
-                </div>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="gap-2"
-                  onClick={exitPitchMode}
-                >
-                  <X className="h-4 w-4" />
-                  Exit Pitch
-                </Button>
-              </>
-            ) : (
-              <Link href={`/pitch-score?company=${id}`}>
-                <Button size="sm" variant="outline">View Pitch Scores</Button>
-              </Link>
-            )}
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              className="gap-2"
+              onClick={() => router.push(`/pitch/${id}`)}
+            >
+              <Play className="h-4 w-4" />
+              Start Pitch
+            </Button>
+            <Link href={`/pitch-score?company=${id}`}>
+              <Button size="sm" variant="outline">View Pitch Scores</Button>
+            </Link>
           </div>
         </div>
       </div>
 
       <div className="flex h-[calc(100vh-73px)]">
-        {/* Pitch Chat Section - Left Side */}
-        <div className={isPitchMode ? "w-full flex flex-col" : "w-1/2 border-r flex flex-col"}>
-          {!isPitchMode ? (
-            /* Pre-Pitch State - Show Start Pitch Button */
-            <>
-              <div className="flex-1 flex flex-col items-center justify-center p-8 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-900 dark:to-gray-800">
-                <div className="text-center max-w-md">
-                  <div className="mb-8">
-                    <div className="w-20 h-20 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
-                      <Play className="w-10 h-10 text-primary" />
-                    </div>
-                    <h2 className="text-2xl font-bold mb-2">Ready to Pitch?</h2>
-                    <p className="text-muted-foreground mb-6">
-                      Test your sales pitch for <strong>{company.name}</strong> and get real-time feedback on 8 key criteria.
-                    </p>
-                  </div>
-
-                  <div className="space-y-4 mb-8">
-                    <div className="flex items-center gap-3 text-sm">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span>2-minute timed evaluation</span>
-                    </div>
-                    <div className="flex items-center gap-3 text-sm">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                      <span>Real-time criteria tracking</span>
-                    </div>
-                    <div className="flex items-center gap-3 text-sm">
-                      <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                      <span>Instant feedback & scoring</span>
-                    </div>
-                    <div className="flex items-center gap-3 text-sm">
-                      <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                      <span>Automated follow-up emails</span>
-                    </div>
-                  </div>
-
-                  <Button 
-                    size="lg" 
-                    className="w-full gap-2 text-lg py-6"
-                    onClick={startPitch}
-                  >
-                    <Play className="w-5 h-5" />
-                    Start Your Pitch
-                  </Button>
-                  
-                  <p className="text-xs text-muted-foreground mt-4">
-                    Click to begin your 2-minute pitch evaluation
-                  </p>
-                </div>
-              </div>
-            </>
-          ) : (
-            /* Active Pitch State - Show Chat Interface */
-            <>
-              <div className="flex-1 overflow-y-auto p-4">
-                <div className="max-w-3xl mx-auto space-y-4">
-                  {messages.map((message, index) => (
-                    <div
-                      key={index}
-                      className={`flex ${
-                        message.role === "user" ? "justify-end" : "justify-start"
-                      }`}
-                    >
-                      <div
-                        className={`max-w-[80%] rounded-lg p-4 ${
-                          message.role === "user"
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-muted"
-                        }`}
-                      >
-                        <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                      </div>
-                    </div>
-                  ))}
-                  {isLoading && (
-                    <div className="flex justify-start">
-                      <div className="bg-muted rounded-lg p-4 animate-pulse">
-                        <p className="text-sm">Evaluating your pitch...</p>
-                      </div>
-                    </div>
-                  )}
-                  <div ref={messagesEndRef} />
-                </div>
-              </div>
-
-              {/* Input Section */}
-              <div className="border-t p-4 bg-background/50 backdrop-blur-sm">
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    sendMessage();
-                  }}
-                  className="max-w-3xl mx-auto flex gap-2"
-                >
-                  <input
-                    type="text"
-                    value={inputMessage}
-                    onChange={(e) => setInputMessage(e.target.value)}
-                    placeholder={isPitchEnded ? "Pitch ended" : "Type your pitch here..."}
-                    disabled={isPitchEnded || isLoading}
-                    className="flex-1 rounded-md border border-input bg-background px-4 py-3 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 shadow-sm"
-                  />
-                  <Button 
-                    type="submit" 
-                    disabled={isPitchEnded || isLoading || !inputMessage.trim()}
-                    size="lg"
-                    className="px-6"
-                  >
-                    <Send className="h-4 w-4" />
-                  </Button>
-                </form>
-              </div>
-            </>
-          )}
+        {/* Chat Section - Left Side */}
+        <div className="w-1/2 border-r">
+          <CopilotChat
+            className="h-full"
+            instructions={`You are a sales coaching AI helping sellers pitch to ${company.name}. Guide them through the pitch process, help them handle objections, and close deals.`}
+            labels={{
+              title: `Pitch Assistant - ${company.name}`,
+              initial: `Welcome! I'm here to help you pitch to ${company.name}. What product or service are you selling, and which decision maker are you targeting?`,
+            }}
+          />
         </div>
 
-        {/* Company Details - Right Side (only when not in pitch mode) */}
-        {!isPitchMode && (
-          <div className="w-1/2 overflow-y-auto p-6">
-            <div className="max-w-2xl mx-auto space-y-6">
+        {/* Company Details - Right Side */}
+        <div className="w-1/2 overflow-y-auto p-6">
+          <div className="max-w-2xl mx-auto space-y-6">
             {/* Company Header */}
             <div className="flex items-start gap-4">
               <Building2 className="h-12 w-12 text-muted-foreground mt-1" />
@@ -662,7 +325,7 @@ export default function CompanyDetailsPage({ params }: PageProps) {
                 {company.currentSolutions.map((solution, index) => (
                   <span
                     key={index}
-                    className="inline-flex items-center rounded-md bg-yellow-500 px-2.5 py-0.5 text-sm"
+                    className="inline-flex items-center rounded-md bg-secondary px-2.5 py-0.5 text-sm"
                   >
                     {solution}
                   </span>
@@ -691,7 +354,6 @@ export default function CompanyDetailsPage({ params }: PageProps) {
               </div>
             </div>
           </div>
-          )}
         </div>
       </div>
     </div>

@@ -1,11 +1,12 @@
 "use client";
 
-import { use } from "react";
+import { use, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useCoAgent, useCopilotAction, useCopilotAdditionalInstructions } from "@copilotkit/react-core";
 import { CopilotKitCSSProperties, CopilotChat } from "@copilotkit/react-ui";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Building2, Users, Briefcase, Globe, Target, ArrowLeft } from "lucide-react";
+import { Building2, Users, Briefcase, Globe, Target, ArrowLeft, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface PageProps {
@@ -33,42 +34,146 @@ interface CompanyDetails {
 }
 
 // Mock company data - in real app, fetch from API
-const getCompanyDetails = (id: string): CompanyDetails => ({
-  id,
-  name: "TechCorp Solutions",
-  industry: "Software Development",
-  employees: "500-1000",
-  website: "www.techcorp.com",
-  description: "A leading software development company specializing in enterprise solutions, cloud computing, and AI-driven applications.",
-  jobOpenings: 12,
-  needs: [
-    "Cloud infrastructure optimization",
-    "DevOps tooling and automation",
-    "Cybersecurity solutions",
-    "Employee training platforms",
-  ],
-  challenges: [
-    "Scaling development teams efficiently",
-    "Maintaining code quality at scale",
-    "Reducing time-to-market for new features",
-    "Managing multi-cloud environments",
-  ],
-  currentSolutions: [
-    "AWS for cloud hosting",
-    "Jenkins for CI/CD",
-    "Slack for communication",
-    "Jira for project management",
-  ],
-  decisionMakers: [
-    { name: "Sarah Johnson", role: "CTO", focus: "Technology strategy and innovation" },
-    { name: "Mike Chen", role: "VP Engineering", focus: "Development processes and team efficiency" },
-    { name: "Lisa Brown", role: "Director of IT", focus: "Infrastructure and security" },
-  ],
-});
+const getCompanyDetails = (id: string): CompanyDetails => {
+  const companies: Record<string, CompanyDetails> = {
+    "1": {
+      id: "1",
+      name: "TechCorp Solutions",
+      industry: "Software Development",
+      employees: "500-1000",
+      website: "www.techcorp.com",
+      description: "A leading software development company specializing in enterprise solutions, cloud computing, and AI-driven applications.",
+      jobOpenings: 12,
+      needs: [
+        "Cloud infrastructure optimization",
+        "DevOps tooling and automation",
+        "Cybersecurity solutions",
+        "Employee training platforms",
+      ],
+      challenges: [
+        "Scaling development teams efficiently",
+        "Maintaining code quality at scale",
+        "Reducing time-to-market for new features",
+        "Managing multi-cloud environments",
+      ],
+      currentSolutions: [
+        "AWS for cloud hosting",
+        "Jenkins for CI/CD",
+        "Slack for communication",
+        "Jira for project management",
+      ],
+      decisionMakers: [
+        { name: "Sarah Johnson", role: "CTO", focus: "Technology strategy and innovation" },
+        { name: "Mike Chen", role: "VP Engineering", focus: "Development processes and team efficiency" },
+        { name: "Lisa Brown", role: "Director of IT", focus: "Infrastructure and security" },
+      ],
+    },
+    "2": {
+      id: "2",
+      name: "Global Manufacturing Inc",
+      industry: "Manufacturing",
+      employees: "1000-5000",
+      website: "www.globalmanufacturing.com",
+      description: "A global leader in advanced manufacturing solutions, specializing in automation, robotics, and supply chain optimization.",
+      jobOpenings: 8,
+      needs: [
+        "Supply chain visibility tools",
+        "Predictive maintenance solutions",
+        "Quality control automation",
+        "Workforce management systems",
+      ],
+      challenges: [
+        "Optimizing production efficiency",
+        "Reducing equipment downtime",
+        "Managing complex global supply chains",
+        "Implementing Industry 4.0 technologies",
+      ],
+      currentSolutions: [
+        "SAP for ERP",
+        "Siemens for automation",
+        "Microsoft Teams for communication",
+        "Tableau for analytics",
+      ],
+      decisionMakers: [
+        { name: "Robert Williams", role: "COO", focus: "Operations and efficiency" },
+        { name: "Emily Zhang", role: "VP Supply Chain", focus: "Supply chain optimization" },
+        { name: "David Martinez", role: "Director of Manufacturing", focus: "Production and quality" },
+      ],
+    },
+    "3": {
+      id: "3",
+      name: "Healthcare Innovations",
+      industry: "Healthcare",
+      employees: "100-500",
+      website: "www.healthcareinnovations.com",
+      description: "A healthcare technology company focused on improving patient outcomes through innovative digital health solutions and data analytics.",
+      jobOpenings: 15,
+      needs: [
+        "Patient data management systems",
+        "Telemedicine platforms",
+        "Healthcare analytics tools",
+        "Compliance management solutions",
+      ],
+      challenges: [
+        "Ensuring HIPAA compliance",
+        "Integrating with legacy systems",
+        "Improving patient engagement",
+        "Managing healthcare data security",
+      ],
+      currentSolutions: [
+        "Epic for EHR",
+        "Zoom for telemedicine",
+        "Office 365 for productivity",
+        "Veracode for security",
+      ],
+      decisionMakers: [
+        { name: "Dr. Patricia Thompson", role: "Chief Medical Officer", focus: "Clinical excellence and patient care" },
+        { name: "James Wilson", role: "CTO", focus: "Healthcare technology and innovation" },
+        { name: "Maria Garcia", role: "VP Compliance", focus: "Regulatory compliance and data security" },
+      ],
+    },
+    "4": {
+      id: "4",
+      name: "Finance Leaders Ltd",
+      industry: "Financial Services",
+      employees: "5000+",
+      website: "www.financeleaders.com",
+      description: "A leading financial services company providing investment banking, wealth management, and corporate finance solutions globally.",
+      jobOpenings: 20,
+      needs: [
+        "Risk management platforms",
+        "Regulatory compliance tools",
+        "Trading analytics systems",
+        "Customer relationship management",
+      ],
+      challenges: [
+        "Adapting to changing regulations",
+        "Enhancing cybersecurity measures",
+        "Improving customer experience",
+        "Managing operational costs",
+      ],
+      currentSolutions: [
+        "Bloomberg Terminal for trading",
+        "Salesforce for CRM",
+        "Workday for HR",
+        "Splunk for security monitoring",
+      ],
+      decisionMakers: [
+        { name: "Michael Anderson", role: "CFO", focus: "Financial strategy and risk management" },
+        { name: "Jennifer Lee", role: "Chief Risk Officer", focus: "Risk assessment and compliance" },
+        { name: "Thomas Brown", role: "CIO", focus: "Technology infrastructure and security" },
+      ],
+    },
+  };
+
+  // Return the company details if found, otherwise return TechCorp as default
+  return companies[id] || companies["1"];
+};
 
 export default function CompanyDetailsPage({ params }: PageProps) {
   const { id } = use(params);
   const company = getCompanyDetails(id);
+  const router = useRouter();
 
   // Add company context to the AI
   useCopilotAdditionalInstructions(
@@ -123,9 +228,19 @@ export default function CompanyDetailsPage({ params }: PageProps) {
               Back to Companies
             </Button>
           </Link>
-          <Link href={`/pitch-score?company=${id}`}>
-            <Button size="sm">View Pitch Scores</Button>
-          </Link>
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              className="gap-2"
+              onClick={() => router.push(`/pitch/${id}`)}
+            >
+              <Play className="h-4 w-4" />
+              Start Pitch
+            </Button>
+            <Link href={`/pitch-score?company=${id}`}>
+              <Button size="sm" variant="outline">View Pitch Scores</Button>
+            </Link>
+          </div>
         </div>
       </div>
 

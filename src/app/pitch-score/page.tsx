@@ -1,313 +1,226 @@
 "use client";
 
 import { useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import Link from "next/link";
-import { ArrowLeft, Download, Send } from "lucide-react";
-import { useCopilotAction } from "@copilotkit/react-core";
+import { ArrowLeft, Trophy, AlertCircle, Clock, TrendingUp, Eye } from "lucide-react";
 
-interface AssessmentCriteria {
+interface PitchHistory {
   id: string;
-  category: string;
-  criteria: string;
-  description: string;
-  score: number;
-  weight: number;
-}
-
-interface PitchAssessment {
-  sellerId: string;
-  sellerName: string;
+  conversationId: string;
   companyId: string;
   companyName: string;
+  sellerName: string;
   date: string;
-  overallScore: number;
-  criteria: AssessmentCriteria[];
-  feedback: string;
-  recommendation: "highly_recommend" | "recommend" | "neutral" | "not_recommend";
+  score: number;
+  isPassing: boolean;
+  duration: string;
+  messageCount: number;
+  criteriaMetCount: number;
 }
 
 export default function PitchScorePage() {
-  const searchParams = useSearchParams();
-  const companyId = searchParams.get("company") || "1";
-
-  const [assessment, setAssessment] = useState<PitchAssessment>({
-    sellerId: "seller-1",
-    sellerName: "John Smith",
-    companyId,
-    companyName: "TechCorp Solutions",
-    date: new Date().toISOString().split("T")[0],
-    overallScore: 0,
-    criteria: [
-      {
-        id: "1",
-        category: "Product Knowledge",
-        criteria: "Understanding of Product/Service",
-        description: "Demonstrates deep knowledge of features, benefits, and use cases",
-        score: 0,
-        weight: 20,
-      },
-      {
-        id: "2",
-        category: "Communication",
-        criteria: "Clarity and Articulation",
-        description: "Communicates ideas clearly and adapts message to audience",
-        score: 0,
-        weight: 15,
-      },
-      {
-        id: "3",
-        category: "Needs Analysis",
-        criteria: "Understanding Customer Needs",
-        description: "Asks relevant questions and identifies pain points accurately",
-        score: 0,
-        weight: 20,
-      },
-      {
-        id: "4",
-        category: "Solution Fit",
-        criteria: "Relevance of Proposed Solution",
-        description: "Aligns solution with specific company needs and challenges",
-        score: 0,
-        weight: 20,
-      },
-      {
-        id: "5",
-        category: "Objection Handling",
-        criteria: "Addressing Concerns",
-        description: "Handles objections professionally and provides satisfactory answers",
-        score: 0,
-        weight: 15,
-      },
-      {
-        id: "6",
-        category: "Professionalism",
-        criteria: "Overall Professionalism",
-        description: "Maintains professional demeanor, punctuality, and follow-up",
-        score: 0,
-        weight: 10,
-      },
-    ],
-    feedback: "",
-    recommendation: "neutral",
-  });
-
-  // Calculate overall score
-  const calculateOverallScore = () => {
-    const totalScore = assessment.criteria.reduce((sum, criterion) => {
-      return sum + (criterion.score * criterion.weight) / 100;
-    }, 0);
-    return Math.round(totalScore);
-  };
-
-  // Update criterion score
-  const updateScore = (criterionId: string, score: number) => {
-    setAssessment(prev => ({
-      ...prev,
-      criteria: prev.criteria.map(c =>
-        c.id === criterionId ? { ...c, score } : c
-      ),
-      overallScore: calculateOverallScore(),
-    }));
-  };
-
-  // CopilotKit action to help with assessment
-  useCopilotAction({
-    name: "suggest_feedback",
-    description: "Suggest constructive feedback based on the scores",
-    parameters: [
-      {
-        name: "scores",
-        type: "object",
-        description: "The current assessment scores",
-        required: true,
-      },
-    ],
-    handler: async ({ scores }) => {
-      // Generate feedback based on scores
-      const feedback = "Based on the scores, the seller showed strong product knowledge but could improve on needs analysis...";
-      setAssessment(prev => ({ ...prev, feedback }));
-      return "Feedback suggestion added";
+  const router = useRouter();
+  
+  // Mock pitch history data - in real app, fetch from API
+  const [pitchHistory] = useState<PitchHistory[]>([
+    {
+      id: "1",
+      conversationId: "pitch-1-1703123456",
+      companyId: "1",
+      companyName: "TechCorp Solutions",
+      sellerName: "John Smith",
+      date: new Date().toISOString(),
+      score: 75,
+      isPassing: true,
+      duration: "1:45",
+      messageCount: 8,
+      criteriaMetCount: 6,
     },
-  });
+    {
+      id: "2",
+      conversationId: "pitch-2-1703123456",
+      companyId: "2",
+      companyName: "Global Manufacturing Inc",
+      sellerName: "John Smith",
+      date: new Date(Date.now() - 86400000).toISOString(),
+      score: 50,
+      isPassing: false,
+      duration: "2:00",
+      messageCount: 12,
+      criteriaMetCount: 4,
+    },
+    {
+      id: "3",
+      conversationId: "pitch-3-1703123456",
+      companyId: "3",
+      companyName: "Healthcare Innovations",
+      sellerName: "John Smith",
+      date: new Date(Date.now() - 172800000).toISOString(),
+      score: 87.5,
+      isPassing: true,
+      duration: "1:30",
+      messageCount: 10,
+      criteriaMetCount: 7,
+    },
+  ]);
 
-  const getRecommendationColor = (recommendation: PitchAssessment["recommendation"]) => {
-    switch (recommendation) {
-      case "highly_recommend":
-        return "text-green-600";
-      case "recommend":
-        return "text-blue-600";
-      case "neutral":
-        return "text-yellow-600";
-      case "not_recommend":
-        return "text-red-600";
-    }
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+    
+    if (diffInDays === 0) return "Today";
+    if (diffInDays === 1) return "Yesterday";
+    if (diffInDays < 7) return `${diffInDays} days ago`;
+    
+    return date.toLocaleDateString();
   };
 
-  const overallScore = calculateOverallScore();
+  const getScoreColor = (score: number) => {
+    if (score >= 80) return "text-green-600 dark:text-green-400";
+    if (score >= 60) return "text-blue-600 dark:text-blue-400";
+    if (score >= 40) return "text-yellow-600 dark:text-yellow-400";
+    return "text-red-600 dark:text-red-400";
+  };
+
+  // Calculate statistics
+  const totalPitches = pitchHistory.length;
+  const successfulPitches = pitchHistory.filter(p => p.isPassing).length;
+  const averageScore = pitchHistory.reduce((sum, p) => sum + p.score, 0) / totalPitches;
+  const successRate = (successfulPitches / totalPitches) * 100;
 
   return (
-    <div className="min-h-screen p-8">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-background p-8">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
         <div className="mb-8">
-          <Link href={`/company/${companyId}`}>
+          <Link href="/companies">
             <Button variant="ghost" size="sm" className="gap-2 mb-4">
               <ArrowLeft className="h-4 w-4" />
-              Back to Company Details
+              Back to Companies
             </Button>
           </Link>
           
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold">Seller's Pitch Score</h1>
+              <h1 className="text-3xl font-bold">Pitch History</h1>
               <p className="text-muted-foreground mt-1">
-                Evaluate {assessment.sellerName}'s pitch to {assessment.companyName}
+                Track your sales pitch performance over time
               </p>
-            </div>
-            <div className="text-right">
-              <div className="text-4xl font-bold">{overallScore}%</div>
-              <p className="text-sm text-muted-foreground">Overall Score</p>
             </div>
           </div>
         </div>
 
-        {/* Assessment Criteria */}
-        <div className="space-y-6 mb-8">
-          {assessment.criteria.map((criterion) => (
-            <div key={criterion.id} className="rounded-lg border bg-card p-6">
-              <div className="mb-4">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-semibold">{criterion.criteria}</h3>
-                  <span className="text-sm text-muted-foreground">
-                    Weight: {criterion.weight}%
-                  </span>
-                </div>
-                <p className="text-sm text-muted-foreground">{criterion.description}</p>
+        {/* Statistics */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <div className="bg-card rounded-lg border p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Total Pitches</p>
+                <p className="text-2xl font-bold">{totalPitches}</p>
               </div>
+              <Clock className="h-8 w-8 text-muted-foreground" />
+            </div>
+          </div>
+          
+          <div className="bg-card rounded-lg border p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Success Rate</p>
+                <p className="text-2xl font-bold">{successRate.toFixed(0)}%</p>
+              </div>
+              <Trophy className="h-8 w-8 text-muted-foreground" />
+            </div>
+          </div>
+          
+          <div className="bg-card rounded-lg border p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Average Score</p>
+                <p className="text-2xl font-bold">{averageScore.toFixed(0)}%</p>
+              </div>
+              <TrendingUp className="h-8 w-8 text-muted-foreground" />
+            </div>
+          </div>
+          
+          <div className="bg-card rounded-lg border p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Successful</p>
+                <p className="text-2xl font-bold">{successfulPitches}/{totalPitches}</p>
+              </div>
+              <AlertCircle className="h-8 w-8 text-muted-foreground" />
+            </div>
+          </div>
+        </div>
 
-              <div className="space-y-3">
-                <div className="flex items-center justify-between text-sm">
-                  <span>Score</span>
-                  <span className="font-medium">{criterion.score}/10</span>
+        {/* Pitch List */}
+        <div className="space-y-4">
+          <h2 className="text-xl font-semibold">Recent Pitches</h2>
+          
+          {pitchHistory.map((pitch) => (
+            <div
+              key={pitch.id}
+              className="rounded-lg border bg-card p-6 hover:shadow-lg transition-shadow cursor-pointer"
+              onClick={() => router.push(`/pitch-results/${pitch.conversationId}?company=${pitch.companyId}`)}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-4 mb-2">
+                    <h3 className="text-lg font-semibold">{pitch.companyName}</h3>
+                    {pitch.isPassing ? (
+                      <Trophy className="h-5 w-5 text-green-500" />
+                    ) : (
+                      <AlertCircle className="h-5 w-5 text-red-500" />
+                    )}
+                  </div>
+                  
+                  <div className="flex items-center gap-6 text-sm text-muted-foreground">
+                    <span>Seller: {pitch.sellerName}</span>
+                    <span>{formatDate(pitch.date)}</span>
+                    <span>Duration: {pitch.duration}</span>
+                    <span>{pitch.messageCount} messages</span>
+                  </div>
+                  
+                  <div className="mt-3 flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm">Score:</span>
+                      <span className={`font-semibold ${getScoreColor(pitch.score)}`}>
+                        {pitch.score}%
+                      </span>
+                    </div>
+                    <Progress value={pitch.score} className="h-2 w-32" />
+                    <span className="text-sm text-muted-foreground">
+                      {pitch.criteriaMetCount}/8 criteria met
+                    </span>
+                  </div>
                 </div>
-                <div className="flex gap-2">
-                  {[...Array(10)].map((_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => updateScore(criterion.id, i + 1)}
-                      className={`h-8 w-8 rounded border transition-colors ${
-                        criterion.score >= i + 1
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-background hover:bg-secondary"
-                      }`}
-                    >
-                      {i + 1}
-                    </button>
-                  ))}
-                </div>
+                
+                <Button variant="ghost" size="sm" className="gap-2">
+                  <Eye className="h-4 w-4" />
+                  View Details
+                </Button>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Overall Assessment */}
-        <div className="rounded-lg border bg-card p-6 mb-6">
-          <h3 className="font-semibold mb-4">Overall Assessment</h3>
-          
-          <div className="mb-6">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium">Total Score</span>
-              <span className="text-2xl font-bold">{overallScore}%</span>
-            </div>
-            <Progress value={overallScore} className="h-3" />
+        {/* Empty State */}
+        {pitchHistory.length === 0 && (
+          <div className="text-center py-12">
+            <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">No pitch history yet</h3>
+            <p className="text-muted-foreground mb-4">
+              Start practicing your sales pitches to see your progress here
+            </p>
+            <Link href="/companies">
+              <Button>Browse Companies</Button>
+            </Link>
           </div>
-
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium mb-2 block">
-                Recommendation
-              </label>
-              <select
-                className="w-full rounded-md border px-3 py-2"
-                value={assessment.recommendation}
-                onChange={(e) =>
-                  setAssessment(prev => ({
-                    ...prev,
-                    recommendation: e.target.value as PitchAssessment["recommendation"],
-                  }))
-                }
-              >
-                <option value="highly_recommend">Highly Recommend</option>
-                <option value="recommend">Recommend</option>
-                <option value="neutral">Neutral</option>
-                <option value="not_recommend">Do Not Recommend</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="text-sm font-medium mb-2 block">
-                Additional Feedback
-              </label>
-              <textarea
-                className="w-full rounded-md border px-3 py-2 min-h-[100px]"
-                placeholder="Provide constructive feedback for the seller..."
-                value={assessment.feedback}
-                onChange={(e) =>
-                  setAssessment(prev => ({ ...prev, feedback: e.target.value }))
-                }
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div className="flex gap-4">
-          <Button className="flex-1" size="lg">
-            <Send className="h-4 w-4 mr-2" />
-            Submit Assessment
-          </Button>
-          <Button variant="outline" size="lg">
-            <Download className="h-4 w-4 mr-2" />
-            Export Report
-          </Button>
-        </div>
-
-        {/* Recent Assessments */}
-        <div className="mt-12">
-          <h2 className="text-xl font-semibold mb-4">Recent Assessments</h2>
-          <div className="space-y-3">
-            <div className="rounded-lg border bg-card p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">Jane Doe - FinanceTech Corp</p>
-                  <p className="text-sm text-muted-foreground">2 days ago</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-bold">85%</p>
-                  <p className={`text-sm ${getRecommendationColor("highly_recommend")}`}>
-                    Highly Recommend
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="rounded-lg border bg-card p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">Mike Johnson - RetailMax</p>
-                  <p className="text-sm text-muted-foreground">5 days ago</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-bold">72%</p>
-                  <p className={`text-sm ${getRecommendationColor("recommend")}`}>
-                    Recommend
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );

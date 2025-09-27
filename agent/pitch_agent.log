@@ -1,0 +1,92 @@
+2025-09-27 14:11:23,527 - agent.server - INFO - Request: GET http://localhost:9000/health
+2025-09-27 14:11:23,528 - agent.server - INFO - Response: 200 - 0.001s
+2025-09-27 14:11:48,472 - agent.server - INFO - Request: POST http://localhost:9000/pitch/initialize
+2025-09-27 14:11:48,474 - agent.server - INFO - Initializing pitch for conversation: pitch-1-1759007505877
+2025-09-27 14:11:48,475 - agent.server - INFO - Pitch initialized successfully: pitch-1-1759007505877
+2025-09-27 14:11:48,475 - agent.server - INFO - Response: 200 - 0.003s
+2025-09-27 14:11:48,745 - agent.server - INFO - Request: POST http://localhost:9000/pitch/status
+2025-09-27 14:11:48,746 - agent.server - INFO - Response: 200 - 0.001s
+2025-09-27 14:11:54,656 - agent.server - INFO - Request: POST http://localhost:9000/pitch/initialize
+2025-09-27 14:11:54,656 - agent.server - INFO - Initializing pitch for conversation: pitch-1-1759007513272
+2025-09-27 14:11:54,656 - agent.server - INFO - Pitch initialized successfully: pitch-1-1759007513272
+2025-09-27 14:11:54,656 - agent.server - INFO - Response: 200 - 0.001s
+2025-09-27 14:11:54,890 - agent.server - INFO - Request: POST http://localhost:9000/pitch/status
+2025-09-27 14:11:54,890 - agent.server - INFO - Response: 200 - 0.001s
+2025-09-27 14:12:01,159 - agent.server - INFO - Request: POST http://localhost:9000/pitch/initialize
+2025-09-27 14:12:01,161 - agent.server - INFO - Initializing pitch for conversation: pitch-1-1759007518596
+2025-09-27 14:12:01,161 - agent.server - INFO - Pitch initialized successfully: pitch-1-1759007518596
+2025-09-27 14:12:01,161 - agent.server - INFO - Response: 200 - 0.002s
+2025-09-27 14:12:01,400 - agent.server - INFO - Request: POST http://localhost:9000/pitch/status
+2025-09-27 14:12:01,401 - agent.server - INFO - Response: 200 - 0.001s
+2025-09-27 14:16:32,965 - agent.server - INFO - Request: POST http://localhost:9000/pitch/initialize
+2025-09-27 14:16:32,967 - agent.server - INFO - Initializing pitch for conversation: pitch-1-1759007792687
+2025-09-27 14:16:32,967 - agent.server - INFO - Pitch initialized successfully: pitch-1-1759007792687
+2025-09-27 14:16:32,967 - agent.server - INFO - Response: 200 - 0.002s
+2025-09-27 14:16:33,206 - agent.server - INFO - Request: POST http://localhost:9000/pitch/status
+2025-09-27 14:16:33,207 - agent.server - INFO - Response: 200 - 0.001s
+2025-09-27 14:17:19,277 - agent.server - INFO - Request: POST http://localhost:9000/pitch/initialize
+2025-09-27 14:17:19,278 - agent.server - INFO - Initializing pitch for conversation: pitch-1-1759007839025
+2025-09-27 14:17:19,279 - agent.server - INFO - Pitch initialized successfully: pitch-1-1759007839025
+2025-09-27 14:17:19,279 - agent.server - INFO - Response: 200 - 0.002s
+2025-09-27 14:17:19,515 - agent.server - INFO - Request: POST http://localhost:9000/pitch/status
+2025-09-27 14:17:19,515 - agent.server - INFO - Response: 200 - 0.001s
+2025-09-27 14:21:50,413 - agent.server - INFO - Request: POST http://localhost:9000/pitch/initialize
+2025-09-27 14:21:50,415 - agent.server - INFO - Initializing pitch for conversation: pitch-2-1759008110170
+2025-09-27 14:21:50,415 - agent.server - INFO - Pitch initialized successfully: pitch-2-1759008110170
+2025-09-27 14:21:50,415 - agent.server - INFO - Response: 200 - 0.002s
+2025-09-27 14:21:50,644 - agent.server - INFO - Request: POST http://localhost:9000/pitch/status
+2025-09-27 14:21:50,644 - agent.server - INFO - Response: 200 - 0.001s
+2025-09-27 14:22:03,864 - agent.server - INFO - Request: POST http://localhost:9000/pitch/initialize
+2025-09-27 14:22:03,865 - agent.server - INFO - Initializing pitch for conversation: pitch-1-1759008123623
+2025-09-27 14:22:03,865 - agent.server - INFO - Pitch initialized successfully: pitch-1-1759008123623
+2025-09-27 14:22:03,866 - agent.server - INFO - Response: 200 - 0.001s
+2025-09-27 14:22:04,097 - agent.server - INFO - Request: POST http://localhost:9000/pitch/status
+2025-09-27 14:22:04,098 - agent.server - INFO - Response: 200 - 0.001s
+2025-09-27 14:22:20,379 - agent.server - INFO - Request: POST http://localhost:9000/pitch/evaluate
+2025-09-27 14:22:20,380 - agent.server - INFO - Evaluating pitch message for conversation: pitch-1-1759008123623
+2025-09-27 14:22:23,040 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-27 14:22:23,048 - agent.server - INFO - Pitch passed criteria: pitch-1-1759008123623
+2025-09-27 14:22:23,048 - agent.server - INFO - Pitch evaluation completed: pitch-1-1759008123623
+2025-09-27 14:22:23,049 - agent.server - INFO - Response: 200 - 2.669s
+2025-09-27 14:22:25,808 - agent.server - INFO - Request: POST http://localhost:9000/pitch/status
+2025-09-27 14:22:25,809 - agent.server - INFO - Response: 200 - 0.001s
+2025-09-27 14:22:25,812 - agent.server - INFO - Request: POST http://localhost:9000/pitch/status
+2025-09-27 14:22:25,812 - agent.server - INFO - Response: 200 - 0.000s
+2025-09-27 14:22:47,993 - agent.server - INFO - Request: POST http://localhost:9000/pitch/initialize
+2025-09-27 14:22:47,994 - agent.server - INFO - Initializing pitch for conversation: pitch-1-1759008167736
+2025-09-27 14:22:47,994 - agent.server - INFO - Pitch initialized successfully: pitch-1-1759008167736
+2025-09-27 14:22:47,995 - agent.server - INFO - Response: 200 - 0.001s
+2025-09-27 14:22:48,237 - agent.server - INFO - Request: POST http://localhost:9000/pitch/status
+2025-09-27 14:22:48,238 - agent.server - INFO - Response: 200 - 0.000s
+2025-09-27 14:23:09,362 - agent.server - INFO - Request: POST http://localhost:9000/pitch/status
+2025-09-27 14:23:09,362 - agent.server - INFO - Request: POST http://localhost:9000/pitch/status
+2025-09-27 14:23:09,362 - agent.server - INFO - Response: 200 - 0.001s
+2025-09-27 14:23:09,363 - agent.server - INFO - Response: 200 - 0.001s
+2025-09-27 14:23:24,302 - agent.server - INFO - Request: POST http://localhost:9000/pitch/initialize
+2025-09-27 14:23:24,303 - agent.server - INFO - Initializing pitch for conversation: pitch-1-1759008204053
+2025-09-27 14:23:24,303 - agent.server - INFO - Pitch initialized successfully: pitch-1-1759008204053
+2025-09-27 14:23:24,303 - agent.server - INFO - Response: 200 - 0.001s
+2025-09-27 14:23:24,542 - agent.server - INFO - Request: POST http://localhost:9000/pitch/status
+2025-09-27 14:23:24,542 - agent.server - INFO - Response: 200 - 0.001s
+2025-09-27 14:23:39,481 - agent.server - INFO - Request: POST http://localhost:9000/pitch/initialize
+2025-09-27 14:23:39,481 - agent.server - INFO - Initializing pitch for conversation: pitch-1-1759008219234
+2025-09-27 14:23:39,481 - agent.server - INFO - Pitch initialized successfully: pitch-1-1759008219234
+2025-09-27 14:23:39,481 - agent.server - INFO - Response: 200 - 0.001s
+2025-09-27 14:23:39,719 - agent.server - INFO - Request: POST http://localhost:9000/pitch/status
+2025-09-27 14:23:39,720 - agent.server - INFO - Response: 200 - 0.001s
+2025-09-27 14:23:40,886 - agent.server - INFO - Request: POST http://localhost:9000/pitch/evaluate
+2025-09-27 14:23:40,887 - agent.server - INFO - Evaluating pitch message for conversation: pitch-1-1759008219234
+2025-09-27 14:23:43,616 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-27 14:23:43,619 - agent.server - INFO - Pitch passed criteria: pitch-1-1759008219234
+2025-09-27 14:23:43,619 - agent.server - INFO - Pitch evaluation completed: pitch-1-1759008219234
+2025-09-27 14:23:43,620 - agent.server - INFO - Response: 200 - 2.734s
+2025-09-27 14:23:45,945 - agent.server - INFO - Request: POST http://localhost:9000/pitch/status
+2025-09-27 14:23:45,946 - agent.server - INFO - Response: 200 - 0.001s
+2025-09-27 14:23:45,948 - agent.server - INFO - Request: POST http://localhost:9000/pitch/status
+2025-09-27 14:23:45,949 - agent.server - INFO - Response: 200 - 0.000s
+2025-09-27 14:24:01,701 - agent.server - INFO - Request: POST http://localhost:9000/pitch/initialize
+2025-09-27 14:24:01,701 - agent.server - INFO - Initializing pitch for conversation: pitch-1-1759008241464
+2025-09-27 14:24:01,701 - agent.server - INFO - Pitch initialized successfully: pitch-1-1759008241464
+2025-09-27 14:24:01,702 - agent.server - INFO - Response: 200 - 0.001s
+2025-09-27 14:24:01,947 - agent.server - INFO - Request: POST http://localhost:9000/pitch/status
+2025-09-27 14:24:01,947 - agent.server - INFO - Response: 200 - 0.001s
